@@ -136,6 +136,18 @@
       padding-left: 0.1rem;
     }
 
+    /* ambient audio pill */
+    #ambientAudio {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #ambientAudio.pulse #audioToggle {
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 120, 0.5); }
+      50%      { box-shadow: 0 0 0 10px rgba(255, 215, 120, 0); }
+    }
+
     ::-webkit-scrollbar { width: 5px; background: #2b2b1c; }
     ::-webkit-scrollbar-thumb { background: #b0a58b; border-radius: 20px; }
   </style>
@@ -382,8 +394,29 @@
     </section>
   </main>
 
+  <!-- ========== AMBIENT AUDIO — visible, opt-in ========== -->
+  <div id="ambientAudio" class="fixed bottom-4 right-4 z-50 flex items-center gap-2 pulse">
+    <button id="audioToggle"
+            class="group flex items-center gap-2 bg-[#2b3a1f] text-[#f9f6f0] pl-2 pr-4 py-2 rounded-full shadow-xl border border-[#ffd978]/40 transition-all hover:scale-105 active:scale-95"
+            aria-label="Toggle ambient music"
+            aria-pressed="false">
+      <span class="w-8 h-8 rounded-full bg-[#ffd978] flex items-center justify-center text-[#1e1e1e]">
+        <svg id="audioIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+        </svg>
+      </span>
+      <span class="text-[0.65rem] uppercase tracking-[0.2em] font-bold" id="audioLabel">Ambient</span>
+    </button>
+
+    <!-- Replace the src below with your own royalty-free ambient track -->
+    <audio id="ambientTrack" loop preload="none">
+      <source src="alex.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
   <script>
     (function() {
+      /* ---------- CAROUSEL ---------- */
       const track = document.getElementById('carouselTrack');
       const slides = track ? track.children : [];
       const dots = document.querySelectorAll('.carousel-dot');
@@ -432,6 +465,7 @@
       updateCarousel(0);
       window.addEventListener('resize', () => updateCarousel(currentIndex));
 
+      /* ---------- FADE-IN ON SCROLL ---------- */
       const fadeElements = document.querySelectorAll('.fade-up');
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -448,9 +482,45 @@
         if (rect.top < window.innerHeight - 100) el.classList.add('visible');
       });
 
+      /* ---------- MICRO-INTERACTIONS ---------- */
       document.querySelectorAll('.audio-wave, .carousel-dot').forEach(el => {
         el.addEventListener('touchstart', () => { el.style.transform = 'scale(0.97)'; });
         el.addEventListener('touchend', () => { el.style.transform = ''; });
+      });
+
+      /* ---------- AMBIENT AUDIO (visible, opt-in) ---------- */
+      const btn = document.getElementById('audioToggle');
+      const audio = document.getElementById('ambientTrack');
+      const label = document.getElementById('audioLabel');
+      const icon = document.getElementById('audioIcon');
+      const wrapper = document.getElementById('ambientAudio');
+
+      let playing = false;
+
+      const ICON_NOTE = '<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>';
+      const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+
+      btn.addEventListener('click', async () => {
+        try {
+          if (playing) {
+            audio.pause();
+            label.textContent = 'Ambient';
+            icon.innerHTML = ICON_NOTE;
+            btn.setAttribute('aria-pressed', 'false');
+            wrapper.classList.add('pulse');
+          } else {
+            audio.volume = 0.25;
+            await audio.play();
+            label.textContent = 'Playing';
+            icon.innerHTML = ICON_PAUSE;
+            btn.setAttribute('aria-pressed', 'true');
+            wrapper.classList.remove('pulse');
+          }
+          playing = !playing;
+        } catch (err) {
+          console.warn('Audio blocked:', err);
+          label.textContent = 'Tap again';
+        }
       });
     })();
   </script>
