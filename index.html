@@ -83,7 +83,7 @@
     .tilt-3 { transform: rotate(1.6deg); }
     .blend-multiply { mix-blend-mode: multiply; }
 
-    /* two-color highlight system */
+    /* highlight system */
     .hl-a {
       background: linear-gradient(transparent 55%, #e6ead8 55%);
       color: #2b3a1f;
@@ -122,8 +122,13 @@
       font-size: 0.92em;
       font-weight: 500;
     }
+    .hl-electric {
+      color: #ffb800;
+      font-weight: 900;
+      text-shadow: 0 0 12px rgba(255, 184, 0, 0.35);
+    }
 
-    /* emergency protocol cards */
+    /* protocol cards */
     .protocol-card {
       transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.35s ease;
       will-change: transform;
@@ -132,17 +137,36 @@
       transform: translateY(-6px);
       box-shadow: 0 25px 30px -20px rgba(0, 0, 0, 0.45);
     }
-    .protocol-card ul li {
-      padding-left: 0.1rem;
+
+    /* step card inner blocks */
+    .step-block {
+      border-left: 3px solid rgba(255, 255, 255, 0.35);
+      padding-left: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .step-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 0.15rem;
+    }
+    .step-path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.72rem;
+      background: rgba(0, 0, 0, 0.18);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      display: inline-block;
+      margin: 0.15rem 0;
+      letter-spacing: -0.01em;
     }
 
     /* ambient audio pill */
-    #ambientAudio {
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    #ambientAudio.pulse #audioToggle {
-      animation: pulseGlow 2s ease-in-out infinite;
-    }
+    #ambientAudio { transition: opacity 0.4s ease, transform 0.4s ease; }
+    #ambientAudio.pulse #audioToggle { animation: pulseGlow 2s ease-in-out infinite; }
     @keyframes pulseGlow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 120, 0.5); }
       50%      { box-shadow: 0 0 0 10px rgba(255, 215, 120, 0); }
@@ -156,7 +180,7 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
 
-    <!-- ========== SECTION 1: HERO — DARK OLIVE + SAND SPLIT ========== -->
+    <!-- ========== SECTION 1: HERO ========== -->
     <section class="relative -mx-4 sm:-mx-6 lg:-mx-8 mb-16">
       <div class="absolute top-0 left-0 right-0 h-[45%] bg-[#2b3a1f] z-0"></div>
       <div class="absolute bottom-0 left-0 right-0 h-[55%] bg-[#f9f6f0] z-0"></div>
@@ -193,12 +217,12 @@
         <!-- subhead & byline -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 md:mt-24 fade-up">
           <div class="md:col-span-2">
-            <p class="text-2xl sm:text-3xl font-light leading-snug text-[#2b3a1f]">
-              <span class="font-bold bg-[#2b3a1f] text-[#f9f6f0] px-2 py-0.5">We are the last generation</span> that can stop the sixth mass extinction. The science is not a debate — it's a distress signal.
+            <p class="text-2xl sm:text-3xl font-light leading-snug text-[#f9f6f0]">
+              <span class="font-bold bg-[#ffd978] text-[#1e1e1e] px-2 py-0.5">We are the last generation</span> that can stop the sixth mass extinction. The science is not a debate — it's a distress signal.
             </p>
           </div>
           <div class="flex md:justify-end items-start">
-            <div class="text-sm uppercase tracking-wider text-[#5a5a4a] border-l-2 border-[#b0a58b] pl-4">
+            <div class="text-sm uppercase tracking-wider text-[#e6d7b8] border-l-2 border-[#ffd978] pl-4">
               <p class="font-bold">By Dr. Amara Okafor</p>
               <p class="text-xs">Senior Climate Correspondent</p>
               <p class="text-xs mt-1">March 14, 2026 · 8 min read</p>
@@ -206,48 +230,105 @@
           </div>
         </div>
 
-        <!-- ========== EMERGENCY PROTOCOLS — always visible, color-coded ========== -->
+        <!-- OPENING PARAGRAPH — on light card so it's readable -->
+        <div class="mt-12 fade-up">
+          <div class="bg-[#f9f6f0] p-6 md:p-8 rounded-sm shadow-xl border-l-8 border-[#c4452d] max-w-3xl">
+            <p class="text-lg md:text-xl leading-relaxed text-[#1e1e1e]">
+              Only yesterday, over <span class="hl-stat">281,500</span> active financial profiles were exposed inside illegal <span class="hl-stat">₦100</span> shadow databases, allowing immediate bank account cash drain exploits across Lagos.
+            </p>
+            <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#1e1e1e]">
+              👉 To <strong class="font-black text-[#1e1e1e]">not be a victim</strong> of this <strong class="hl-electric">unauthorized database exploitation</strong>, follow these steps to protect your device and secure your funds from remote black-market harvesting.
+            </p>
+          </div>
+        </div>
+
+        <!-- ========== EMERGENCY PROTOCOLS ========== -->
         <div class="mt-14 fade-up">
-          <h3 class="text-xl font-black uppercase tracking-wider flex items-center gap-2 mb-4 text-[#2b3a1f]">
-            <span class="w-2 h-2 bg-[#2b3a1f]"></span> Emergency protocols
+          <h3 class="text-xl font-black uppercase tracking-wider flex items-center gap-2 mb-4 text-[#f9f6f0]">
+            <span class="w-2 h-2 bg-[#ffd978]"></span> Emergency protocols
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            <!-- Heatwave — olive -->
-            <div class="protocol-card bg-[#2b3a1f] text-[#f9f6f0] p-5 rounded-sm shadow-lg border-t-4 border-[#ffd978]">
+            <!-- STEP 1 — SIM PIN Lock · OLIVE -->
+            <div class="protocol-card bg-[#2b3a1f] text-[#f9f6f0] p-5 rounded-sm shadow-lg border-t-4 border-[#ffd978] flex flex-col">
               <p class="text-[0.65rem] uppercase tracking-[0.25em] opacity-70 mb-2">Protocol 01</p>
-              <h4 class="text-lg font-black mb-3 text-[#ffd978]">Heatwave response</h4>
-              <ul class="text-sm space-y-2 leading-relaxed opacity-95">
-                <li class="flex gap-2"><span class="text-[#ffd978]">—</span> Stay hydrated, drink water every 30 mins.</li>
-                <li class="flex gap-2"><span class="text-[#ffd978]">—</span> Avoid direct sun between 11am–4pm.</li>
-                <li class="flex gap-2"><span class="text-[#ffd978]">—</span> Check on elderly neighbors and children.</li>
-                <li class="flex gap-2"><span class="text-[#ffd978]">—</span> Cooling centers open citywide.</li>
-              </ul>
+              <h4 class="text-lg font-black mb-1 text-[#ffd978]">Activate SIM-PIN Lock</h4>
+
+              <div class="step-block mt-3">
+                <span class="step-label text-[#ffd978]">The Problem</span>
+                <p class="text-sm leading-relaxed opacity-95">
+                  Scammers don't need your physical phone. They use leaked black-market database details to execute a remote <strong class="font-bold">"SIM-Swap"</strong> through corrupt carrier agents — letting them intercept your banking OTP codes on their own devices.
+                </p>
+              </div>
+
+              <div class="step-block mt-4">
+                <span class="step-label text-[#ffd978]">The Fix</span>
+                <p class="text-sm leading-relaxed opacity-95">
+                  Set a mandatory hardware SIM PIN immediately.
+                </p>
+                <p class="mt-2 text-sm">
+                  <span class="step-path">Settings ➔ Security &amp; Privacy ➔ More Security Settings ➔ SIM Card Lock</span>
+                </p>
+                <p class="text-sm leading-relaxed opacity-95 mt-2">
+                  Toggle <strong class="font-bold">Lock SIM Card</strong> to ON, enter the carrier default (usually <span class="font-mono text-[#ffd978]">0000</span> or <span class="font-mono text-[#ffd978]">1234</span>), then change it to a private 4-digit PIN.
+                </p>
+                <p class="text-sm leading-relaxed opacity-95 mt-2 italic">
+                  Once active, your SIM becomes un-clonable — it cannot be mounted on any external device without your hardware passkey.
+                </p>
+              </div>
             </div>
 
-            <!-- Flood — coral -->
-            <div class="protocol-card bg-[#c4452d] text-white p-5 rounded-sm shadow-lg border-t-4 border-[#1e1e1e]">
+            <!-- STEP 2 — Purge Cache · CORAL -->
+            <div class="protocol-card bg-[#c4452d] text-white p-5 rounded-sm shadow-lg border-t-4 border-[#1e1e1e] flex flex-col">
               <p class="text-[0.65rem] uppercase tracking-[0.25em] opacity-80 mb-2">Protocol 02</p>
-              <h4 class="text-lg font-black mb-3">Flood evacuation</h4>
-              <ul class="text-sm space-y-2 leading-relaxed opacity-95">
-                <li class="flex gap-2"><span>—</span> Move to higher ground immediately.</li>
-                <li class="flex gap-2"><span>—</span> Never walk or drive through floodwaters.</li>
-                <li class="flex gap-2"><span>—</span> Six inches of moving water can knock you down.</li>
-                <li class="flex gap-2"><span>—</span> Keep phone charged and emergency contacts saved.</li>
-              </ul>
+              <h4 class="text-lg font-black mb-1">Purge Bank App Cache</h4>
+
+              <div class="step-block mt-3" style="border-left-color: rgba(255,255,255,0.45);">
+                <span class="step-label">The Problem</span>
+                <p class="text-sm leading-relaxed opacity-95">
+                  Banking apps save a digital footprint called a <strong class="font-bold">"Session Token"</strong> in background memory so you don't retype your password constantly. Black-market exploits use background web scripts to silently clone these signatures while you browse.
+                </p>
+              </div>
+
+              <div class="step-block mt-4" style="border-left-color: rgba(255,255,255,0.45);">
+                <span class="step-label">The Fix</span>
+                <p class="text-sm leading-relaxed opacity-95">
+                  Hard-purge your local device tokens every <strong class="font-bold">14 days</strong>.
+                </p>
+                <p class="mt-2 text-sm">
+                  <span class="step-path" style="background: rgba(0,0,0,0.25);">Settings ➔ Apps ➔ App Management ➔ [Banking App] ➔ Storage Usage</span>
+                </p>
+                <p class="text-sm leading-relaxed opacity-95 mt-2">
+                  Tap <strong class="font-bold">Clear Cache</strong>, then <strong class="font-bold">Clear Data</strong>. This terminates all active background session keys and forces hidden remote trackers to lose access instantly.
+                </p>
+              </div>
             </div>
 
-            <!-- Air quality — gold -->
-            <div class="protocol-card bg-[#ffd978] text-[#1e1e1e] p-5 rounded-sm shadow-lg border-t-4 border-[#2b3a1f]">
+            <!-- STEP 3 — USSD Freeze · GOLD -->
+            <div class="protocol-card bg-[#ffd978] text-[#1e1e1e] p-5 rounded-sm shadow-lg border-t-4 border-[#2b3a1f] flex flex-col">
               <p class="text-[0.65rem] uppercase tracking-[0.25em] opacity-70 mb-2">Protocol 03</p>
-              <h4 class="text-lg font-black mb-3 text-[#2b3a1f]">Air quality alert</h4>
-              <ul class="text-sm space-y-2 leading-relaxed">
-                <li class="flex gap-2"><span class="text-[#2b3a1f]">—</span> Keep windows and doors closed.</li>
-                <li class="flex gap-2"><span class="text-[#2b3a1f]">—</span> Use HEPA filters indoors.</li>
-                <li class="flex gap-2"><span class="text-[#2b3a1f]">—</span> Wear N95 masks outdoors.</li>
-                <li class="flex gap-2"><span class="text-[#2b3a1f]">—</span> No exercise outside when AQI &gt; 150.</li>
-              </ul>
+              <h4 class="text-lg font-black mb-1 text-[#2b3a1f]">Emergency USSD Freeze</h4>
+
+              <div class="step-block mt-3" style="border-left-color: rgba(43,58,31,0.4);">
+                <span class="step-label" style="color:#2b3a1f;">The Problem</span>
+                <p class="text-sm leading-relaxed">
+                  If you notice a sudden drop in cellular signal (a sign of a live SIM-swap attempt) or an unexpected bank debit alert — waiting to call support is a critical error. The response window is <strong class="font-bold">under 3 minutes</strong>.
+                </p>
+              </div>
+
+              <div class="step-block mt-4" style="border-left-color: rgba(43,58,31,0.4);">
+                <span class="step-label" style="color:#2b3a1f;">The Fix</span>
+                <p class="text-sm leading-relaxed">
+                  Memorize or physically write your bank's <strong class="font-bold">offline USSD Emergency Account Lock shortcode</strong> on a card in your wallet.
+                </p>
+                <p class="text-sm leading-relaxed mt-2">
+                  Dialing the freeze string from any active phone line instantly places an administrative <strong class="font-bold">"Post No Debit" (PND)</strong> lock on your entire profile.
+                </p>
+                <p class="text-sm leading-relaxed mt-2 italic">
+                  Keep it mapped out so you can isolate your assets within seconds — without needing internet.
+                </p>
+              </div>
             </div>
 
           </div>
@@ -255,7 +336,7 @@
       </div>
     </section>
 
-    <!-- ========== SECTION 2: BROKEN GRID — CROSS-SECTION OVERLAP ========== -->
+    <!-- ========== SECTION 2: BROKEN GRID ========== -->
     <section class="relative mt-20 mb-28">
       <div class="absolute inset-0 flex">
         <div class="w-2/5 bg-[#2b3a1f] h-full"></div>
@@ -310,7 +391,7 @@
       </div>
     </section>
 
-    <!-- ========== SECTION 3: CAROUSEL WITH DECORATIVE BORDERS ========== -->
+    <!-- ========== SECTION 3: CAROUSEL ========== -->
     <section class="my-28 relative fade-up">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#2b3a1f]">FRONTLINES</h2>
@@ -360,7 +441,7 @@
       </div>
     </section>
 
-    <!-- ========== SECTION 4: AUDIO COMPONENT ========== -->
+    <!-- ========== SECTION 4: AUDIO ========== -->
     <section class="my-20 fade-up">
       <div class="bg-[#2b3a1f] text-[#f9f6f0] p-6 md:p-8 rounded-sm flex flex-col justify-between shadow-xl max-w-3xl mx-auto">
         <div>
@@ -394,7 +475,7 @@
     </section>
   </main>
 
-  <!-- ========== AMBIENT AUDIO — visible, opt-in ========== -->
+  <!-- ========== AMBIENT AUDIO ========== -->
   <div id="ambientAudio" class="fixed bottom-4 right-4 z-50 flex items-center gap-2 pulse">
     <button id="audioToggle"
             class="group flex items-center gap-2 bg-[#2b3a1f] text-[#f9f6f0] pl-2 pr-4 py-2 rounded-full shadow-xl border border-[#ffd978]/40 transition-all hover:scale-105 active:scale-95"
@@ -408,15 +489,14 @@
       <span class="text-[0.65rem] uppercase tracking-[0.2em] font-bold" id="audioLabel">Ambient</span>
     </button>
 
-    <!-- Replace the src below with your own royalty-free ambient track -->
     <audio id="ambientTrack" loop preload="none">
-      <source src="alex.mp3" type="audio/mpeg">
+      <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=ambient-piano-amp-strings-10711.mp3" type="audio/mpeg">
     </audio>
   </div>
 
   <script>
     (function() {
-      /* ---------- CAROUSEL ---------- */
+      /* CAROUSEL */
       const track = document.getElementById('carouselTrack');
       const slides = track ? track.children : [];
       const dots = document.querySelectorAll('.carousel-dot');
@@ -465,7 +545,7 @@
       updateCarousel(0);
       window.addEventListener('resize', () => updateCarousel(currentIndex));
 
-      /* ---------- FADE-IN ON SCROLL ---------- */
+      /* FADE-IN */
       const fadeElements = document.querySelectorAll('.fade-up');
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -482,13 +562,13 @@
         if (rect.top < window.innerHeight - 100) el.classList.add('visible');
       });
 
-      /* ---------- MICRO-INTERACTIONS ---------- */
+      /* MICRO */
       document.querySelectorAll('.audio-wave, .carousel-dot').forEach(el => {
         el.addEventListener('touchstart', () => { el.style.transform = 'scale(0.97)'; });
         el.addEventListener('touchend', () => { el.style.transform = ''; });
       });
 
-      /* ---------- AMBIENT AUDIO (visible, opt-in) ---------- */
+      /* AMBIENT AUDIO */
       const btn = document.getElementById('audioToggle');
       const audio = document.getElementById('ambientTrack');
       const label = document.getElementById('audioLabel');
@@ -496,7 +576,6 @@
       const wrapper = document.getElementById('ambientAudio');
 
       let playing = false;
-
       const ICON_NOTE = '<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>';
       const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
 
