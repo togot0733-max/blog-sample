@@ -260,9 +260,17 @@
     }
     #shareToast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ambient audio pill */
-    #ambientAudio { transition: opacity 0.4s ease, transform 0.4s ease; }
-    #ambientAudio.pulse #audioToggle { animation: pulseGlow 2s ease-in-out infinite; }
+    /* ===== AMBIENT AUDIO PILL ===== */
+    #ambientAudio {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 50;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #ambientAudio.pulse #audioToggle {
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
     @keyframes pulseGlow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 120, 0.5); }
       50%      { box-shadow: 0 0 0 10px rgba(255, 215, 120, 0); }
@@ -327,7 +335,7 @@
         </div>
 
         <!-- ============================================= -->
-        <!-- ==========   SHARE BAR (NEW)   ============== -->
+        <!-- ==========   SHARE BAR   ==================== -->
         <!-- ============================================= -->
         <div class="mt-10 fade-up">
           <div class="bg-[#2b3a1f] p-5 md:p-6 rounded-sm shadow-2xl border-l-8 border-[#ffd978] max-w-3xl">
@@ -608,7 +616,7 @@
       </div>
     </section>
 
-    <!-- ========== SECTION 4: AUDIO ========== -->
+    <!-- ========== SECTION 4: AUDIO DISPATCH ========== -->
     <section class="my-20 fade-up">
       <div class="bg-[#2b3a1f] text-[#f9f6f0] p-6 md:p-8 rounded-sm flex flex-col justify-between shadow-xl max-w-3xl mx-auto">
         <div>
@@ -635,7 +643,7 @@
       </div>
     </section>
 
-    <!-- ========== FINAL CTA (with share) ========== -->
+    <!-- ========== FINAL CTA ========== -->
     <section class="mt-32 text-center fade-up">
       <p class="text-6xl md:text-8xl font-black text-[#2b3a1f]/10 leading-none select-none">ACT</p>
       <p class="-mt-8 md:-mt-12 text-2xl md:text-4xl font-bold tracking-tight max-w-2xl mx-auto text-[#2b3a1f]">The window is closing. Share this. Demand change.</p>
@@ -675,8 +683,10 @@
   <!-- ========== SHARE TOAST ========== -->
   <div id="shareToast" role="status" aria-live="polite">Link copied</div>
 
-  <!-- ========== AMBIENT AUDIO ========== -->
-  <div id="ambientAudio" class="fixed bottom-4 right-4 z-50 flex items-center gap-2 pulse">
+  <!-- ============================================================
+       AMBIENT AUDIO — gesture-gated, autoplay-policy compliant
+       ============================================================ -->
+  <div id="ambientAudio" class="pulse">
     <button id="audioToggle"
             class="group flex items-center gap-2 bg-[#2b3a1f] text-[#f9f6f0] pl-2 pr-4 py-2 rounded-full shadow-xl border border-[#ffd978]/40 transition-all hover:scale-105 active:scale-95"
             aria-label="Toggle ambient music"
@@ -688,23 +698,98 @@
       </span>
       <span class="text-[0.65rem] uppercase tracking-[0.2em] font-bold" id="audioLabel">Ambient</span>
     </button>
-
-    <audio id="ambientTrack" loop preload="none">
-      <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=ambient-piano-amp-strings-10711.mp3" type="audio/mpeg">
-    </audio>
   </div>
+
+  <!-- Hidden audio element — no native controls, gesture-gated -->
+  <audio
+    id="ambientTrack"
+    loop
+    preload="none"
+    playsinline
+    aria-hidden="true"
+    style="display:none;">
+    <source src=alex.mp3 type="audio/mpeg">
+  </audio>
 
   <script>
     (function() {
+      /* ============================================
+         GESTURE-GATED AMBIENT AUDIO
+         ============================================ */
+      const audio = document.getElementById('ambientTrack');
+      const btn = document.getElementById('audioToggle');
+      const label = document.getElementById('audioLabel');
+      const icon = document.getElementById('audioIcon');
+      const wrapper = document.getElementById('ambientAudio');
+
+      if (!audio) return;
+      audio.volume = 0.25;
+
+      const GESTURES = ['click', 'touchstart', 'scroll'];
+      const listenerOpts = { passive: true, capture: true };
+      let engaged = false;
+
+      function detach() {
+        GESTURES.forEach(function (type) {
+          document.removeEventListener(type, onGesture, listenerOpts);
+        });
+      }
+
+      function onGesture() {
+        if (engaged) return;
+        engaged = true;
+        detach();
+
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise
+            .then(function () {
+              label.textContent = 'Playing';
+              icon.innerHTML = ICON_PAUSE;
+              btn.setAttribute('aria-pressed', 'true');
+              wrapper.classList.remove('pulse');
+            })
+            .catch(function () {
+              engaged = false;
+              GESTURES.forEach(function (type) {
+                document.addEventListener(type, onGesture, listenerOpts);
+              });
+            });
+        }
+      }
+
+      GESTURES.forEach(function (type) {
+        document.addEventListener(type, onGesture, listenerOpts);
+      });
+
+      const ICON_NOTE = '<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>';
+      const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+
+      // Manual toggle button — works after the auto-start
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (audio.paused) {
+          audio.play();
+          label.textContent = 'Playing';
+          icon.innerHTML = ICON_PAUSE;
+          btn.setAttribute('aria-pressed', 'true');
+          wrapper.classList.remove('pulse');
+        } else {
+          audio.pause();
+          label.textContent = 'Ambient';
+          icon.innerHTML = ICON_NOTE;
+          btn.setAttribute('aria-pressed', 'false');
+          wrapper.classList.add('pulse');
+        }
+      });
+
       /* ============================================
          SHARE SYSTEM
          ============================================ */
       const SHARE_TITLE = 'BVN FRAUD VICTIMS · Emergency Protocols';
       const SHARE_TEXT  = '⚠️ 281,500 BVN profiles exposed. Follow these 3 emergency steps to protect your bank account from SIM-swap fraud. Share with your loved ones now:';
       const SHARE_URL   = window.location.href;
-      const SHARE_IMAGE = 'BVN FOTO.jpg';
 
-      // Update meta og:url dynamically
       const ogUrl = document.querySelector('meta[property="og:url"]');
       if (ogUrl) ogUrl.setAttribute('content', SHARE_URL);
 
@@ -717,13 +802,11 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
       }
 
-      // Build share links
       const waLink   = `https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + ' ' + SHARE_URL)}`;
       const twLink   = `https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`;
       const fbLink   = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}`;
       const tgLink   = `https://t.me/share/url?url=${encodeURIComponent(SHARE_URL)}&text=${encodeURIComponent(SHARE_TEXT)}`;
 
-      // Wire up top share bar
       const waEl  = document.getElementById('shareWhatsApp');
       const twEl  = document.getElementById('shareTwitter');
       const fbEl  = document.getElementById('shareFacebook');
@@ -739,7 +822,6 @@
       if (tgEl)  tgEl.href  = tgLink;
       if (waBot) waBot.href = waLink;
 
-      // Native share
       const canNativeShare = typeof navigator.share === 'function';
       if (!canNativeShare && natEl) natEl.style.display = 'none';
 
@@ -757,13 +839,11 @@
       }
       if (natEl) natEl.addEventListener('click', nativeShare);
 
-      // Copy link
       async function copyLink() {
         try {
           await navigator.clipboard.writeText(SHARE_URL);
           showToast('Link copied ✓');
         } catch {
-          // Fallback
           const ta = document.createElement('textarea');
           ta.value = SHARE_URL;
           ta.style.position = 'fixed';
@@ -778,7 +858,6 @@
       if (cpEl)  cpEl.addEventListener('click', copyLink);
       if (cpBot) cpBot.addEventListener('click', copyLink);
 
-      // Floating rail
       document.querySelectorAll('#shareRail [data-share]').forEach(btn => {
         btn.addEventListener('click', () => {
           const type = btn.dataset.share;
@@ -861,40 +940,6 @@
       document.querySelectorAll('.audio-wave, .carousel-dot').forEach(el => {
         el.addEventListener('touchstart', () => { el.style.transform = 'scale(0.97)'; });
         el.addEventListener('touchend', () => { el.style.transform = ''; });
-      });
-
-      /* AMBIENT AUDIO */
-      const btn = document.getElementById('audioToggle');
-      const audio = document.getElementById('ambientTrack');
-      const label = document.getElementById('audioLabel');
-      const icon = document.getElementById('audioIcon');
-      const wrapper = document.getElementById('ambientAudio');
-
-      let playing = false;
-      const ICON_NOTE = '<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>';
-      const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
-
-      btn.addEventListener('click', async () => {
-        try {
-          if (playing) {
-            audio.pause();
-            label.textContent = 'Ambient';
-            icon.innerHTML = ICON_NOTE;
-            btn.setAttribute('aria-pressed', 'false');
-            wrapper.classList.add('pulse');
-          } else {
-            audio.volume = 0.25;
-            await audio.play();
-            label.textContent = 'Playing';
-            icon.innerHTML = ICON_PAUSE;
-            btn.setAttribute('aria-pressed', 'true');
-            wrapper.classList.remove('pulse');
-          }
-          playing = !playing;
-        } catch (err) {
-          console.warn('Audio blocked:', err);
-          label.textContent = 'Tap again';
-        }
       });
     })();
   </script>
